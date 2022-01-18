@@ -24,6 +24,7 @@ a3 = Minus part1 part2
 --2.
 eval :: Exp -> Integer
 eval (Con c) = c
+eval (Var name)    = varVal name -- added later for error fix
 eval (Plus e1 e2)  = eval e1 + eval e2
 eval (Times e1 e2) = eval e1 * eval e2
 eval (Minus e1 e2) = eval e1 - eval e2
@@ -55,3 +56,28 @@ eval' (Minus e1 e2) = eval' e1 - eval' e2
 
 
 --Exercise 1.5
+isoR :: (Bool -> t) -> (t, t)
+isoR f = (f True, f False )
+
+isoL :: (t, t) -> (Bool -> t)
+isoL (x,y) = \z -> if z then x else y
+    -- True -> x
+    -- False  -> y
+
+-- now show isoL o isoR nad isoR o isoL = id
+--  or: isoL and isoR are bijections
+
+--isoL o isoR = id
+--in Haskell: (isoL . isoR) f = id f (for all f)
+--        <=> (isoL (isoR)) = f
+--        <=> (isoL (f True, f False)) = f
+--        <=> \z -> if z then (f True) else (f False) = f
+--        <=> \z -> case z of 
+--                    True -> f True
+--                    False -> f False
+
+-- This is true for any  function from Bool to any type t
+
+
+ 
+
