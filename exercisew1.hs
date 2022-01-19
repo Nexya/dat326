@@ -84,15 +84,33 @@ data Table a = Env String a -- TODO
 --(a)
 vars :: Table Double 
 vars = error  "TODO"
---Exercise 1.3
 
+--Exercise 1.3
 --Cardinality = number of item in set
 --Either a b has cardinality A + B
 --(a,b)      has cardinality A * B
 --a -> b     has cardinality B^A 
 
 --Exercise 1.4
+--1.
+-- Bool -> Maybe Bool
 
+-- Bool = {True, False}
+-- Maybe Bool = {Just True, Just False, Nothing}
+-- Cardinality: 3^2 = 9
+
+--2. 
+-- Maybe Bool -> Bool
+
+-- Maybe Bool = {Just True, Just False, Nothing}
+-- Bool = {True, False}
+-- Cardinality: 2^3 = 8
+
+--3.
+-- Maybe(Bool, Maybe(Bool, Maybe Bool))
+-- Bool = {True, False}
+-- Maybe Bool = {Just True, Just False, Nothing}
+-- Cardinality:  
 
 --Exercise 1.5
 isoR :: (Bool -> t) -> (t, t)
@@ -117,6 +135,13 @@ isoL (x,y) = \z -> if z then x else y
 
 -- This is true for any  function from Bool to any type t
 
+--Exercise 1.8
+-- for a sequence a what is a◦(1+)? What is (1+)◦a?
+-- since
+--      f◦g = \x -> f(g(x))
+-- then
+--      a◦(+1) = \x -> a(1+x)
+--      (+1)◦a = \x -> 1+ (a(x)) 
+
 
  
-
