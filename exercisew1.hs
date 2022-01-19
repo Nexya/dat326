@@ -55,6 +55,45 @@ eval' (Times e1 e2) = eval' e1 * eval' e2
 eval' (Minus e1 e2) = eval' e1 - eval' e2
 
 
+--Exercise 1.2
+data E2 a = Con' a
+        | Var' String
+        | Plus'  (E2 a) (E2 a)
+        | Minus' (E2 a) (E2 a)
+        | Times' (E2 a) (E2 a)
+    deriving (Eq, Show)
+
+--1.
+--(a)
+a1' :: E2 Double
+a1' = Plus' (Con' 2.0) (Var' "a")
+
+--(b)
+a2' :: E2 Double
+a2' = Plus' (Con' 5.3) (Times' (Var' "a") (Var' "b")) 
+
+--(c)
+a3' :: E2 a
+a3' =   Minus'
+        (Times' (Var' "a") (Plus' (Var' "b") (Var' "c")))
+        (Times' (Plus' (Var' "d") (Var' "e")) (Plus' (Var' "f") (Var' "a")))
+
+--2.
+data Table a = Env String a -- TODO
+
+--(a)
+vars :: Table Double 
+vars = error  "TODO"
+--Exercise 1.3
+
+--Cardinality = number of item in set
+--Either a b has cardinality A + B
+--(a,b)      has cardinality A * B
+--a -> b     has cardinality B^A 
+
+--Exercise 1.4
+
+
 --Exercise 1.5
 isoR :: (Bool -> t) -> (t, t)
 isoR f = (f True, f False )
