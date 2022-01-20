@@ -79,12 +79,27 @@ a3' =   Minus'
         (Times' (Plus' (Var' "d") (Var' "e")) (Plus' (Var' "f") (Var' "a")))
 
 --2.
-data Table a = Env String a -- TODO
+type Env v s = [(v,s)]
+type Table a = Env String  a
 
 --(a)
 vars :: Table Double 
-vars = error  "TODO"
+vars = [("a",1.5),("b",4.8),("c",2.4),("d",7.4),("e",5.8),("f",1.7)]
 
+--(b)
+varVal' :: Table a -> String -> a
+varVal' t s | fst (head t) == s = snd (head t)
+            | otherwise         = varVal' (tail t) s
+
+--(c)
+eval'' :: Num a => Table a -> E2 a -> a
+eval'' t (Con' c)       = c
+eval'' t (Var' name)    = varVal' t name
+eval'' t (Plus' e1 e2)  = eval'' t e1 + eval'' t e2
+eval'' t (Minus' e1 e2) = eval'' t e1 - eval'' t e2
+eval'' t (Times' e1 e2) = eval'' t e1 * eval'' t e2
+
+ 
 --Exercise 1.3
 --Cardinality = number of item in set
 --Either a b has cardinality A + B
@@ -108,9 +123,9 @@ vars = error  "TODO"
 
 --3.
 -- Maybe(Bool, Maybe(Bool, Maybe Bool))
--- Bool = {True, False}
--- Maybe Bool = {Just True, Just False, Nothing}
--- Cardinality:  
+-- (a,b) har cardinality a*b 
+-- Maybe(a.b) has cardinality 1+(a*b) where +1 is Nothing
+-- Cardinality:  1+(2*(1+(2*3))) = 15
 
 --Exercise 1.5
 isoR :: (Bool -> t) -> (t, t)
@@ -144,4 +159,7 @@ isoL (x,y) = \z -> if z then x else y
 --      (+1)◦a = \x -> 1+ (a(x)) 
 
 
+--1.6
+f2p :: (a -> (b,c)) -> (a -> b, a -> c)
+f2p = error "TODO"
  
