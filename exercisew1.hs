@@ -150,6 +150,11 @@ isoL (x,y) = \z -> if z then x else y
 
 -- This is true for any  function from Bool to any type t
 
+--1.6
+f2p :: (a -> (b,c)) -> (a -> b, a -> c)
+f2p = error "TODO"
+
+
 --Exercise 1.8
 -- for a sequence a what is a◦(1+)? What is (1+)◦a?
 -- since
@@ -159,7 +164,3 @@ isoL (x,y) = \z -> if z then x else y
 --      (+1)◦a = \x -> 1+ (a(x)) 
 
 
---1.6
-f2p :: (a -> (b,c)) -> (a -> b, a -> c)
-f2p = error "TODO"
- 
