@@ -1,3 +1,5 @@
+import Numeric.Natural
+import Data.Ratio
 
 -- SYNTAX: what it looks like
 -- SEMANTICS: what it means
@@ -86,3 +88,32 @@ data Maybe' a = Just' a | Nothing'
 inv :: (Eq a, Num a, Fractional a) => a -> Maybe' a
 inv 0 = Nothing'
 inv r = Just' (1 / r)
+
+-- sequences
+type N     = Natural
+type Qp    = Ratio N 
+type Seq a = N -> a
+
+idSeq :: Seq N
+idSeq i = i             -- {1,2,3,4,...}
+
+invSeq :: Seq Qp
+invSeq i = 1 % (1 + i)  -- {1/1, 1/2, 1/3,...}
+
+pow2 :: Num r => Seq r
+pow2 = (2^)             -- {1,2,4,8,...}
+
+conSeq :: a -> Seq a
+conSeq c i = c          -- {c,c,c,c,...}
+
+addSeq :: Num a => Seq a -> Seq a -> Seq a
+addSeq f g i = f i + g i 
+
+liftSeq2 :: (a -> b -> c) -> Seq a -> Seq b -> Seq c
+liftSeq2 op f g i = op (f i) (g i)  -- {op (f 0) (g0), op (f 1) (g 1),...}
+
+liftSeq1 :: (a -> b) -> Seq a -> Seq b
+liftSeq1 h f i = h (f i)
+
+liftSeq0 :: a -> Seq a
+liftSeq0 c i = c
