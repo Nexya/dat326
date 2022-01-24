@@ -117,3 +117,4 @@ liftSeq1 h f i = h (f i)
 
 liftSeq0 :: a -> Seq a
 liftSeq0 c i = c
+
