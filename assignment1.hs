@@ -1,3 +1,6 @@
+{-# LANGUAGE FlexibleContexts #-}
+import GHC.Classes (Ord)
+import Data.List
 -- ASSIGNMENT 1 
 -- dat326
 
@@ -22,6 +25,10 @@ newtype Set = S [Set]
 
 type Env var dom = [(var,dom)]
 
+rmDupl :: (Eq a, Ord a) => [a] -> [a]
+rmDupl = map head . group . sort
+
+-- helpers
 lift :: Set -> [Set]
 lift (S x) = x
 
@@ -29,8 +36,10 @@ lift (S x) = x
 eval :: Eq v => Env v Set -> TERM v -> Set
 eval env Empty                = S []
 eval env (Singleton t)        = S [eval env t]
-eval env (Union t1 t2)        = S [] -- make v1 v2 into lists and concat? 
-eval env (Intersection t1 t2) = S [] -- TODO
+eval env (Union t1 t2)        = S [] 
+-- $ rmDupl $ lift (eval env t1) ++ lift (eval env t2)
+eval env (Intersection t1 t2) = S []
+-- $ filter (\x -> x `elem` lift (eval env t1)) (lift(eval env t2))
 eval env (Var v)              = S [] -- TODO
 
 -- check
@@ -38,7 +47,7 @@ eval env (Var v)              = S [] -- TODO
 False ==> _ = True
 True  ==> p = p
 
-check :: Eq v => Env v Set -> PRED v -> Bool 
+check :: Eq v => Env v Set -> PRED v -> Bool
 check env (Elem v t)      = True  -- TODO
 check env (Subset t1 t2)  = True  -- TODO
 check env (Implies p1 p2) = check env p1 ==> check env p2
