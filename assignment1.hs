@@ -28,7 +28,7 @@ newtype Set = S [Set]
 
 type Env var dom = [(var,dom)]
 
-{-- 
+{--  used nub instead
 rmDupl :: (Eq a, Ord a) => [a] -> [a]
 rmDupl = map head . group . sort
 --}
@@ -42,9 +42,9 @@ lift (S x) = x
 eval :: Eq v => Env v Set -> TERM v -> Set
 eval env Empty                = S []
 eval env (Singleton t)        = S [eval env t]
-eval env (Union t1 t2)        = S $ nub $ lift (eval env t1) `union` lift (eval env t2)
+eval env (Union t1 t2)        = S $ nub $ lift (eval env t1) `union` lift (eval env t2) -- can use ++ instead
 eval env (Intersection t1 t2) = S $ nub $ lift (eval env t1) `intersect` lift (eval env t2)
--- $ filter (\x -> x `elem` lift (eval env t1)) (lift(eval env t2))
+-- $ filter (\x -> x `elem` lift (eval env t1)) (lift(eval env t2))   intersection variant
 eval env (Var v)              = fromJust $ lookup v env
 
 -- check
@@ -72,9 +72,11 @@ vonNeumann :: Integer -> TERM Integer
 vonNeumann 0 = Empty
 vonNeumann n = Union (vonNeumann (n-1)) (Singleton (vonNeumann (n-1)))
 
-
+-- om tal 1 är mindre än tal 2 så kommer tal 1 vara ett subset av tal 2
 claim1 :: Integer -> Integer -> Bool
 claim1 n1 n2 = (n1 <= n2) ==> check [] (vonNeumann n1 `Subset` vonNeumann n2)
 
+-- 
 claim2 :: Integer -> Bool
 claim2 n = eval [] (vonNeumann n) == S (map (eval [] . vonNeumann) [0..(n-1)])
+

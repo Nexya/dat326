@@ -70,7 +70,7 @@ a1' = Plus' (Con' 2.0) (Var' "a")
 
 --(b)
 a2' :: E2 Double
-a2' = Plus' (Con' 5.3) (Times' (Var' "a") (Var' "b")) 
+a2' = Plus' (Con' 5.3) (Times' (Var' "a") (Var' "b"))
 
 --(c)
 a3' :: E2 a
@@ -83,7 +83,7 @@ type Env v s = [(v,s)]
 type Table a = Env String  a
 
 --(a)
-vars :: Table Double 
+vars :: Table Double
 vars = [("a",1.5),("b",4.8),("c",2.4),("d",7.4),("e",5.8),("f",1.7)]
 
 --(b)
@@ -99,7 +99,7 @@ eval'' t (Plus' e1 e2)  = eval'' t e1 + eval'' t e2
 eval'' t (Minus' e1 e2) = eval'' t e1 - eval'' t e2
 eval'' t (Times' e1 e2) = eval'' t e1 * eval'' t e2
 
- 
+
 --Exercise 1.3
 --Cardinality = number of item in set
 --Either a b has cardinality A + B
@@ -132,7 +132,7 @@ isoR :: (Bool -> t) -> (t, t)
 isoR f = (f True, f False )
 
 isoL :: (t, t) -> (Bool -> t)
-isoL (x,y) = \z -> if z then x else y
+isoL (x,y) z = if z then x else y
     -- True -> x
     -- False  -> y
 
@@ -150,9 +150,13 @@ isoL (x,y) = \z -> if z then x else y
 
 -- This is true for any  function from Bool to any type t
 
---1.6
+--1.6 
+-- see haskellextra lecture 2
 f2p :: (a -> (b,c)) -> (a -> b, a -> c)
-f2p = error "TODO"
+f2p f = ( fst . f, snd . f)
+
+p2f ::  (a -> b, a -> c) -> (a -> (b,c))
+p2f (f, g) x = (f x, g x)
 
 
 --Exercise 1.8
