@@ -1,3 +1,11 @@
+-- ASSIGNMENT 2 
+-- DAT326
+
+-- GROUP A2.18
+--  Theres Wallinder
+--  Theo Koraag
+--  Sofia Alowersson
+
 -- Recommended skeleton code
 
 {-# LANGUAGE FlexibleContexts, FlexibleInstances #-}
@@ -5,7 +13,7 @@
 module A2 where
 import Prelude hiding ((+),(-),(*),(/),negate,recip,(^),
                         pi, sin,cos,exp,fromInteger,fromRational)
-import DSLsofMath.FunExp ()
+import DSLsofMath.FunExp ( FunExp, derive, eval' )
 import DSLsofMath.Algebra
     ( Transcendental(..),
       MulGroup(recip),
@@ -34,5 +42,8 @@ instance Transcendental a => Transcendental (Tri a) where
 (piTri, sinTri, cosTri, expTri) = undefined;
 
 
+-- eval and derive imported from FunExp 
 -- Part 1
 
+eval'' :: Transcendental a => FunExp -> (a -> a)
+eval'' = eval' . derive
