@@ -13,7 +13,7 @@
 module A2 where
 import Prelude hiding ((+),(-),(*),(/),negate,recip,(^),
                         pi, sin,cos,exp,fromInteger,fromRational)
-import DSLsofMath.FunExp ( FunExp, derive, eval' )
+import DSLsofMath.FunExp ( FunExp, derive, eval', eval )
 import DSLsofMath.Algebra
     ( Transcendental(..),
       MulGroup(recip),
@@ -22,10 +22,9 @@ import DSLsofMath.Algebra
       Additive(..) )
 
 
-type Tri a    = (a,a,a)
+type Tri a    = (a,a,a)      -- (f, f', f'')
 type TriFun a = Tri (a -> a) -- = (a -> a, a -> a, a -> a)
 type FunTri a = a -> Tri a   -- = a -> (a,a,a)
-
 
 instance Additive a => Additive (Tri a) where
     (+) = addTri; zero = zeroTri
@@ -35,11 +34,10 @@ instance AddGroup a => AddGroup (Tri a) where
     negate = negateTri
 instance (AddGroup a, MulGroup a) => MulGroup (Tri a) where
     recip = recipTri
-(oneTri, negateTri, recipTri) = undefined
 
 instance Transcendental a => Transcendental (Tri a) where
     pi = piTri; sin = sinTri; cos = cosTri; exp = expTri;
-(piTri, sinTri, cosTri, expTri) = undefined;
+
 
 
 -- eval and derive imported from FunExp 
@@ -62,16 +60,38 @@ h2 (h, op1, op2) x y = h (op1 x y) == op2 (h x) (h y)
 --      eval'' (f op1 g) \= (eval'' f) op2 (eval'' g)
 -- where op1 (syntactic domain) directly correstponds to op2 (semantic domain)
 
+-- TODO: formulate proof here 
 
+-- TODO: example that should return false?  
+ex = undefined 
 
 
 -- part (b)
 -- tri instances
 
 addTri :: (Additive a) => Tri a -> Tri a -> Tri a
-addTri (a,b,c) (a',b',c') = (a + a', b + b', c + c') 
+addTri (f,f',f'') (g,g',g'') = (f + g, f' + g', f'' + g'') 
 
 zeroTri :: (Additive  a) => Tri a
 zeroTri = (zero, zero, zero)
 
 mulTri = undefined 
+
+oneTri :: (Additive a, Multiplicative a) => Tri a
+oneTri = (one, zero, zero)
+
+negateTri :: (AddGroup  a) => Tri a -> Tri a
+negateTri (a,b,c) = (negate a, negate b, negate c) 
+
+recipTri = undefined 
+
+piTri :: Transcendental a => Tri a
+piTri = (pi, zero, zero)
+
+(sinTri, cosTri, expTri) = undefined;
+
+dd :: FunExp -> FunExp
+dd = derive . derive
+
+evalDD :: (Transcendental a) => FunExp -> FunTri a  
+evalDD f a = (eval f a, eval (derive f) a, eval (dd f) a) -- eval' ?? 
