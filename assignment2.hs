@@ -63,35 +63,56 @@ h2 (h, op1, op2) x y = h (op1 x y) == op2 (h x) (h y)
 -- TODO: formulate proof here 
 
 -- TODO: example that should return false?  
-ex = undefined 
+ex = undefined
 
 
 -- part (b)
 -- tri instances
 
 addTri :: (Additive a) => Tri a -> Tri a -> Tri a
-addTri (f,f',f'') (g,g',g'') = (f + g, f' + g', f'' + g'') 
+addTri (f,f',f'') (g,g',g'') = (f + g, f' + g', f'' + g'')
 
 zeroTri :: (Additive  a) => Tri a
 zeroTri = (zero, zero, zero)
 
-mulTri = undefined 
+mulTri :: (Multiplicative a, Additive a) => Tri a -> Tri a -> Tri a
+mulTri (f,f',f'') (g,g',g'') = ( f * g,
+                                 f' * g + f * g',
+                                 f'' * g + f' * g' + f' * g' + f * g'')
+
 
 oneTri :: (Additive a, Multiplicative a) => Tri a
 oneTri = (one, zero, zero)
 
 negateTri :: (AddGroup  a) => Tri a -> Tri a
-negateTri (a,b,c) = (negate a, negate b, negate c) 
+negateTri (a,b,c) = (negate a, negate b, negate c)
 
-recipTri = undefined 
+recipTri :: (AddGroup a, MulGroup a) => Tri a -> Tri a
+recipTri (f,f',f'') = (recip f,
+                       negate (recip (f*f)) * f',
+                       (f' + f') * recip (f*f*f) * f' + negate (recip(f*f)) * f'')
+
 
 piTri :: Transcendental a => Tri a
 piTri = (pi, zero, zero)
 
-(sinTri, cosTri, expTri) = undefined;
+expTri :: Transcendental a => Tri a -> Tri a
+expTri (f,f',f'') =(exp f,
+                    exp f * f',
+                    exp f * f'' + exp f * f' * f')
+
+sinTri :: Transcendental a => Tri a -> Tri a
+sinTri (f,f',f'') = (sin f,
+                     cos f * f',
+                     negate (sin f) * f' * f' + cos f * f'')
+
+cosTri :: Transcendental a => Tri a -> Tri a
+cosTri (f,f',f'') = (cos f,
+                    negate(sin f) * f', 
+                    negate (cos f) * f' * f' + negate (sin f) * f'') 
 
 dd :: FunExp -> FunExp
 dd = derive . derive
 
-evalDD :: (Transcendental a) => FunExp -> FunTri a  
+evalDD :: (Transcendental a) => FunExp -> FunTri a
 evalDD f a = (eval f a, eval (derive f) a, eval (dd f) a) -- eval' ?? 
