@@ -19,7 +19,7 @@ data FunExp  =  Const REAL
 \end{code}
 
 \begin{code}
-eval :: Transcendental a => FunExp -> a -> a
+eval :: Transcendental a => FunExp -> (a -> a)
 eval (Const alpha)  =  const (fromRational (toRational alpha))
 eval X              =  id
 eval (e1 :+: e2)    =  eval e1 + eval e2
