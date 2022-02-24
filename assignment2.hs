@@ -121,9 +121,6 @@ h2 (h, op1, op2) x y = h (op1 x y) == op2 (h x) (h y)
 --      eval'' (f op1 g) \= (eval'' f) op2 (eval'' g)
 -- where op1 (syntactic domain) directly correstponds to op2 (semantic domain)
 
--- TODO: formulate proof here 
-
--- TODO: example that should return false?  
 
 
 
