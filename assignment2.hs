@@ -21,10 +21,11 @@ import DSLsofMath.Algebra
       Additive(..), (^) )
 
 
+
 type Tri a    = (a,a,a)      -- (f, f', f'')
 type TriFun a = Tri (a -> a) -- = (a -> a, a -> a, a -> a)
 type FunTri a = a -> Tri a   -- = a -> (a,a,a)
-    
+
 
 instance Additive a => Additive (Tri a) where
     (+) = addTri; zero = zeroTri
@@ -40,12 +41,8 @@ instance Transcendental a => Transcendental (Tri a) where
 
 
 
--- eval and derive imported from FunExp 
 -- Part 1
-
-
-
--- part (a)
+-- (a)
 
 eval'' :: Transcendental a => FunExp -> (a -> a)
 eval'' = eval' . derive
@@ -62,7 +59,7 @@ eval'' = eval' . derive
 -- where op1 (syntactic domain) directly correstponds to op2 (semantic domain)
 
 
--- TODO: formulate proof here 
+-- Proof
 {-
 p(eval'') = exist (c1,c2,...cn) & (i=1 -> n) H_n(eval'',Ci, ci)
     where
@@ -108,23 +105,9 @@ let H_2(eval'',mul,(*)) = forall x, y :Syn. eval''( mul x y) == (eval'' x) * (ev
     => not p()   is true
       -- 
     
-        -} 
+        -}
 
--- example (exponential function): 
---      exp (a + b) == exp a * exp b
-
--- following test should hold (example from lecture 4.1.1) if homomorphism
-h2 :: (Transcendental b, Eq b) => (a -> b, a -> a -> a, b -> b -> b) -> a -> a -> Bool
-h2 (h, op1, op2) x y = h (op1 x y) == op2 (h x) (h y)
-
--- to prove that eval'' (second derivative) isn't a homomorphism then we need to find a case where 
---      eval'' (f op1 g) \= (eval'' f) op2 (eval'' g)
--- where op1 (syntactic domain) directly correstponds to op2 (semantic domain)
-
-
-
-
--- part (b)
+-- (b)
 -- tri instances
 
 addTri :: (Additive a) => Tri a -> Tri a -> Tri a
@@ -137,7 +120,7 @@ mulTri :: (Multiplicative a, Additive a) => Tri a -> Tri a -> Tri a
 mulTri (f,f',f'') (g,g',g'') = ( f * g,
                                  f' * g + f * g',
                                  f'' * g + f' * g' + f' * g' + f * g'')
-
+--(x, one, 0)*(x, one, 0) = (1 + 1) = 2
 
 oneTri :: (Additive a, Multiplicative a) => Tri a
 oneTri = (one, zero, zero)
@@ -166,21 +149,22 @@ sinTri (f,f',f'') = (sin f,
 
 cosTri :: Transcendental a => Tri a -> Tri a
 cosTri (f,f',f'') = (cos f,
-                    negate(sin f) * f', 
-                    negate (cos f) * f' * f' + negate (sin f) * f'') 
+                    negate(sin f) * f',
+                    negate (cos f) * f' * f' + negate (sin f) * f'')
 
 dd :: FunExp -> FunExp
 dd = derive . derive
 
---part c
+-- (c)
+
 evalDD :: (Transcendental a) => FunExp -> FunTri a
-evalDD f = \a -> (eval f a, eval (derive f) a, eval (dd f) a) -- eval' ?? 
+evalDD f a = (eval f a, eval (derive f) a, eval (dd f) a) -- eval' ?? 
 
 f1 = X
-f2 = X :+: (Const 1)
+f2 = X :+: Const 1
 
 
-mulLeft f1 f2 a = evalDD exExp a
+mulLeft f1 f2 = evalDD exExp
     where exExp = f1 :*: f2
 
 mulRight f1 f2 a = mulTri (evalDD f1 a) (evalDD f2 a)
@@ -191,6 +175,8 @@ mulTest f1 f2 a = mulLeft f1 f2 a == mulRight f1 f2 a
 
 --h2 (h, op1, op2) x y = h (op1 x y) == op2 (h x) (h y)
 
+
+-- Part 2
 {-
 
 newton :: (R → R) → R → R → R
@@ -205,37 +191,74 @@ next = x − (fx / fx0
 
 -}
 
-newtonTri :: (Tri REAL -> Tri REAL) -> REAL -> REAL -> REAL 
-newtonTri f e x 
-  | abs fx < e = x       
+-- (a)
+newtonTri :: (Tri REAL -> Tri REAL) -> REAL -> REAL -> REAL
+newtonTri f e x
+  | abs fx < e = x
   | fx' /= zero = newtonTri f e next
   | otherwise = newtonTri f e (x + e)
-    where 
+    where
         (fx, fx', fx'') = f (constTri x)
         next = x + negate (fx * recip fx')
 
+-- (b)
+
+--test0 (x,_,_) = evalDD (X :*: X) x
 test0 x = x*x
 test1 x = x*x + negate one
-test2 x = sin x
+test2 = sin
 test3:: Int -> REAL -> Tri REAL -> Tri REAL
 test3 n x y = y^n + negate (constTri x)
+constTri :: (Multiplicative b, Additive c) => a -> (a, b, c)
 constTri x = (x, one, zero)
 
 intervaltest test = map  (newtonTri test 0.001) [-2.0, -1.5..2.0]
 
-intervalround test = map (round . (newtonTri test 0.001)) [-2.0, -1.5..2.0]
+intervalround test = map (round . newtonTri test 0.001) [-2.0, -1.5..2.0]
 
 ex:: REAL -> [REAL]
-ex x = newtonList test2 0.001 [x] 
+ex x = newtonList test2 0.001 [x]
 
 ex2 n x y = newtonList (test3 n x) 0.001 [y]
 
 
-newtonList :: (Tri REAL -> Tri REAL) -> REAL -> [REAL] -> [REAL] 
+newtonList :: (Tri REAL -> Tri REAL) -> REAL -> [REAL] -> [REAL]
 newtonList f e x
-  | abs fx < e = x    
+  | abs fx < e = x
   | fx' /= zero = newtonList f e (x ++ [next])
-  | otherwise = newtonList f e (x ++ [(last x) + e])
-    where 
+  | otherwise = newtonList f e (x ++ [last x + e])
+    where
         (fx, fx', fx'') = f (constTri (last x))
-        next = (last x) + negate (fx * recip fx')
+        next = last x + negate (fx * recip fx')
+
+-- Part 3
+
+data Optima a =
+    Maximum a | Minimum a | Dunno a
+    deriving Show
+
+    
+optim :: (Tri REAL -> Tri REAL) -> REAL -> REAL -> Optima REAL -- Is result REAL or its own type?  
+optim f e x 
+    | fx'' < 0 = Maximum y
+    | fx'' > 0 = Minimum y
+    | otherwise = Dunno y
+        where 
+            y = newtonTri f e x
+            (fx,fx',fx'') = f (constTri y)
+ 
+{--
+            y = newtonTri (fx', fx'', one) e x
+            (fx,fx',fx'') = f . (constTri x)
+--}
+
+optimtesting :: (Tri REAL -> Tri REAL) -> REAL -> REAL -> (REAL , REAL) -- Is result REAL or its own type?  
+optimtesting f e x = (fx'', y)
+        where 
+            y = newtonTri f e x
+            (fx,fx',fx'') = undefined 
+
+optimtest test = map (optim test 0.001) (intervaltest test)
+
+optimtest2 :: (Tri REAL -> Tri REAL) -> [(REAL, REAL)]
+optimtest2 test = map (optimtesting test 0.001) (intervaltest test)
