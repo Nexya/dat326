@@ -9,6 +9,7 @@
 -- Recommended skeleton code
 
 {-# LANGUAGE GADTs, FlexibleContexts, FlexibleInstances, TypeSynonymInstances, StandaloneDeriving, ConstraintKinds #-}
+{-# OPTIONS_GHC -Wno-overlapping-patterns #-}
 module A2 where
 import Prelude hiding ((+),(-),(*),(/),negate,recip,(^),
                         pi, sin,cos,exp,fromInteger,fromRational)
@@ -237,28 +238,34 @@ data Optima a =
     Maximum a | Minimum a | Dunno a
     deriving Show
 
-    
+
+
+getfst (x,_,_) = x
+getsnd (_,x,_) = x
+gettrd (_,_,x) = x
+
+
 optim :: (Tri REAL -> Tri REAL) -> REAL -> REAL -> Optima REAL -- Is result REAL or its own type?  
-optim f e x 
+optim f e x
     | fx'' < 0 = Maximum y
     | fx'' > 0 = Minimum y
     | otherwise = Dunno y
-        where 
-            y = newtonTri f e x
+        where
+            y = newtonTri func e x
+            func a = (getsnd $ f a, gettrd $ f a, zero)
             (fx,fx',fx'') = f (constTri y)
- 
-{--
-            y = newtonTri (fx', fx'', one) e x
-            (fx,fx',fx'') = f . (constTri x)
---}
 
-optimtesting :: (Tri REAL -> Tri REAL) -> REAL -> REAL -> (REAL , REAL) -- Is result REAL or its own type?  
-optimtesting f e x = (fx'', y)
-        where 
-            y = newtonTri f e x
-            (fx,fx',fx'') = undefined 
+
+optimtesting :: (Tri REAL -> Tri REAL) -> REAL -> REAL -> (REAL, REAL, REAL) -- Is result REAL or its own type?  
+optimtesting f e x = (fx', fx'', y)
+        where
+            y = newtonTri func e x
+            func a = (getsnd $ func a, gettrd $ func a, zero)
+            (fx,fx',fx'') = f (constTri y)
 
 optimtest test = map (optim test 0.001) (intervaltest test)
 
-optimtest2 :: (Tri REAL -> Tri REAL) -> [(REAL, REAL)]
+optimtest2 :: (Tri REAL -> Tri REAL) -> [(REAL, REAL, REAL)]
 optimtest2 test = map (optimtesting test 0.001) (intervaltest test)
+
+testfunc func a = (getsnd $ func a, gettrd $ func a, zero)
